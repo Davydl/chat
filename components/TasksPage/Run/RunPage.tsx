@@ -2,6 +2,7 @@
 
 import { XCircle } from "lucide-react";
 import { useTaskRunStatus } from "@/hooks/useTaskRunStatus";
+import RunBreadcrumb from "./RunBreadcrumb";
 import RunPageSkeleton from "./RunPageSkeleton";
 import RunDetails from "./RunDetails";
 
@@ -29,5 +30,10 @@ export default function RunPage({ runId }: RunPageProps) {
     content = <RunDetails runId={runId} data={data} />;
   }
 
-  return <div className="h-screen max-w-2xl">{content}</div>;
+  return (
+    <div className="h-screen max-w-2xl">
+      <RunBreadcrumb runId={runId} />
+      {content}
+    </div>
+  );
 }
