@@ -1,5 +1,8 @@
+"use client";
+
 import { formatTimestamp } from "@/lib/tasks/formatTimestamp";
 import { formatDuration } from "@/lib/tasks/formatDuration";
+import { useElapsedMs } from "@/hooks/useElapsedMs";
 
 interface RunTimelineProps {
   createdAt: string;
@@ -14,14 +17,16 @@ export default function RunTimeline({
   finishedAt,
   durationMs,
 }: RunTimelineProps) {
+  const displayDuration = useElapsedMs(startedAt, durationMs);
+
   const items = [
     { label: "Created", value: formatTimestamp(createdAt) },
     startedAt ? { label: "Started", value: formatTimestamp(startedAt) } : null,
     finishedAt
       ? { label: "Finished", value: formatTimestamp(finishedAt) }
       : null,
-    durationMs !== null
-      ? { label: "Duration", value: formatDuration(durationMs) }
+    displayDuration !== null
+      ? { label: "Duration", value: formatDuration(displayDuration) }
       : null,
   ].filter(Boolean) as { label: string; value: string }[];
 
