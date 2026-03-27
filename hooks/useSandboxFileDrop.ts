@@ -1,4 +1,3 @@
-import { useCallback } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { usePrivy } from "@privy-io/react-auth";
 import { uploadSandboxFiles } from "@/lib/sandboxes/uploadSandboxFiles";
@@ -61,12 +60,5 @@ export function useSandboxFileDrop({
     },
   });
 
-  const handleFilesDropped = useCallback(
-    (files: File[]) => {
-      mutation.mutate(files);
-    },
-    [mutation],
-  );
-
-  return { handleFilesDropped, uploading: mutation.isPending };
+  return { handleFilesDropped: mutation.mutate, uploading: mutation.isPending };
 }
