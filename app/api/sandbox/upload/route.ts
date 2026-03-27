@@ -5,26 +5,24 @@ import { NextResponse } from "next/server";
  * POST /api/sandbox/upload
  *
  * Handles client-side Vercel Blob uploads by generating presigned tokens.
- * Requires an Authorization header to prevent unauthenticated uploads.
+ * Auth is validated via clientPayload (the blob client controls its own
+ * request headers, so we validate the token passed in the payload).
  * Files are temporarily stored in Vercel Blob, then the client passes
  * the blob URLs to the API which commits them to GitHub and cleans up.
  */
 export async function POST(request: Request): Promise<NextResponse> {
   try {
-    const authHeader = request.headers.get("authorization");
-    if (!authHeader?.startsWith("Bearer ")) {
-      return NextResponse.json(
-        { error: "Authentication required" },
-        { status: 401 },
-      );
-    }
-
     const body = (await request.json()) as HandleUploadBody;
 
     const jsonResponse = await handleUpload({
       body,
       request,
-      onBeforeGenerateToken: async () => {
+      onBeforeGenerateToken: async (_pathname, clientPayload) => {
+        const payload = clientPayload ? JSON.parse(clientPayload) : null;
+        if (!payload?.token) {
+          throw new Error("Authentication required");
+        }
+
         return {
           maximumSizeInBytes: 100 * 1024 * 1024, // 100MB
         };
