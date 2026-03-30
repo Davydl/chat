@@ -2,6 +2,9 @@ import { useEffect, useRef } from "react";
 import { useArtistProvider } from "@/providers/ArtistProvider";
 import { useUserProvider } from "@/providers/UserProvder";
 import type { ArtistRecord } from "@/types/Artist";
+import { useAccessToken } from "@/hooks/useAccessToken";
+import { useApiOverride } from "@/hooks/useApiOverride";
+import { NEW_API_BASE_URL } from "@/lib/consts";
 
 /**
  * A hook that automatically selects the artist associated with a room.
@@ -11,24 +14,25 @@ export function useArtistFromRoom(roomId: string) {
   const { userData } = useUserProvider();
   const { selectedArtist, artists, setSelectedArtist, getArtists } = useArtistProvider();
   const hasRun = useRef(false);
+  const accessToken = useAccessToken();
+  const apiOverride = useApiOverride();
+  const baseUrl = apiOverride || NEW_API_BASE_URL;
   
   useEffect(() => {
-    if (hasRun.current || !roomId || !userData?.id) return;
+    if (hasRun.current || !roomId || !userData?.id || !accessToken) return;
     hasRun.current = true;
     
     (async () => {
       try {
-        const response = await fetch(
-          `/api/room/artist?roomId=${encodeURIComponent(roomId)}&accountId=${encodeURIComponent(userData.id)}`
-        );
+        const response = await fetch(`${baseUrl}/api/chats/${encodeURIComponent(roomId)}/artist`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
         
         if (!response.ok) return;
         const data = await response.json();
-        
-        if (data.new_room_id && data.new_room_id !== roomId) {
-          window.history.replaceState({}, '', `/chat/${data.new_room_id}`);
-        }
-        
+
         if (!data.artist_id || selectedArtist?.account_id === data.artist_id) return;
         
         const artistList = artists as ArtistRecord[];
@@ -43,5 +47,5 @@ export function useArtistFromRoom(roomId: string) {
         console.error("Error selecting artist for room:", error);
       }
     })();
-  }, [roomId, userData, selectedArtist, artists, setSelectedArtist, getArtists]);
-} 
+  }, [roomId, userData, selectedArtist, artists, setSelectedArtist, getArtists, accessToken, baseUrl]);
+}
