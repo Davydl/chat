@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import Modal from "@/components/Modal";
 import type { Conversation } from "@/types/Chat";
 import type { ArtistAgent } from "@/lib/supabase/getArtistAgents";
+import { useAccessToken } from "@/hooks/useAccessToken";
+import { useApiOverride } from "@/hooks/useApiOverride";
+import { NEW_API_BASE_URL } from "@/lib/consts";
 
 interface DeleteConfirmationModalProps {
   isOpen: boolean;
@@ -20,6 +23,9 @@ const DeleteConfirmationModal = ({ isOpen, onClose, chatRoom, chatRooms, onDelet
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState("");
   const [deletingProgress, setDeletingProgress] = useState<{ current: number; total: number } | null>(null);
+  const accessToken = useAccessToken();
+  const apiOverride = useApiOverride();
+  const baseUrl = apiOverride || NEW_API_BASE_URL;
   
   // Reset state when modal opens/closes
   useEffect(() => {
@@ -48,6 +54,11 @@ const DeleteConfirmationModal = ({ isOpen, onClose, chatRoom, chatRooms, onDelet
     : 'Delete';
   
   const handleDelete = async () => {
+    if (!accessToken) {
+      setError("Authentication token is missing. Please refresh and try again.");
+      return;
+    }
+
     setIsDeleting(true);
     setError("");
     setDeletingProgress({ current: 0, total: chatCount });
@@ -62,16 +73,19 @@ const DeleteConfirmationModal = ({ isOpen, onClose, chatRoom, chatRooms, onDelet
         
         try {
           const roomId = getChatId(chat);
-          const response = await fetch('/api/room/delete', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ roomId }),
+          const response = await fetch(`${baseUrl}/api/chats`, {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify({ id: roomId }),
           });
           
           const result = await response.json();
           
           if (!response.ok) {
-            throw new Error(result.message || 'Failed to delete chat');
+            throw new Error(result.message || result.error || "Failed to delete chat");
           }
         } catch (chatError) {
           console.error(`Error deleting chat ${getChatName(chat)}:`, chatError);
