@@ -1,4 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
+import { useAccessToken } from "@/hooks/useAccessToken";
+import { useApiOverride } from "@/hooks/useApiOverride";
+import { NEW_API_BASE_URL } from "@/lib/consts";
 
 interface RoomSegmentResponse {
   segmentId: string | null;
@@ -6,14 +9,22 @@ interface RoomSegmentResponse {
 }
 
 export const useChatSegment = (roomId?: string) => {
+  const accessToken = useAccessToken();
+  const apiOverride = useApiOverride();
+  const baseUrl = apiOverride || NEW_API_BASE_URL;
+
   return useQuery({
     queryKey: ["roomSegment", roomId],
     queryFn: async (): Promise<RoomSegmentResponse> => {
-      if (!roomId) {
+      if (!roomId || !accessToken) {
         return { segmentId: null };
       }
 
-      const response = await fetch(`/api/roomSegment?roomId=${roomId}`);
+      const response = await fetch(`${baseUrl}/api/chats/${encodeURIComponent(roomId)}/segment`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
       if (!response.ok) {
         const error = await response.json();
         console.error("[useChatSegment] API error:", {
@@ -24,9 +35,9 @@ export const useChatSegment = (roomId?: string) => {
       }
 
       const data = await response.json();
-      return data;
+      return { segmentId: data.segment_id ?? null };
     },
-    enabled: !!roomId,
+    enabled: !!roomId && !!accessToken,
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
     retry: 2,
   });
