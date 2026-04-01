@@ -35,10 +35,17 @@ export async function copyMessages(
       },
     );
 
-    const result: CopyChatMessagesResponse = await response.json();
+    const result = (await response.json().catch(() => null)) as
+      | CopyChatMessagesResponse
+      | null;
 
-    if (!response.ok) {
-      console.error("Failed to copy messages:", result.error);
+    const isSuccess = response.ok && result?.status === "success";
+    if (!isSuccess) {
+      const missingFields = result?.missing_fields?.join(", ");
+      const details = missingFields
+        ? `${result?.error || result?.message || "Request validation failed"} (missing_fields: ${missingFields})`
+        : result?.error || result?.message || `HTTP ${response.status}`;
+      console.error("Failed to copy messages:", details);
       return false;
     }
 

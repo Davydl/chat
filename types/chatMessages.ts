@@ -10,4 +10,6 @@ export interface CopyChatMessagesResponse {
   copied_count?: number;
   cleared_existing?: boolean;
   error?: string;
+  message?: string;
+  missing_fields?: string[];
 }
