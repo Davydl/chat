@@ -1,19 +1,29 @@
-import { deleteMemoriesByRoomIdAfterTimestamp } from "../supabase/deleteMemoriesByChatIdAfterTimestamp";
-import { getMemoryById } from "../supabase/getMemoryById";
+import { getClientApiBaseUrl } from "@/lib/api/getClientApiBaseUrl";
 
-export async function deleteTrailingMessages({ id }: { id: string }) {
-  const memory = await getMemoryById({ id });
+/**
+ * Deletes trailing messages in a chat from a given message ID onward.
+ */
+export async function deleteTrailingMessages({
+  chatId,
+  fromMessageId,
+  accessToken,
+}: {
+  chatId: string;
+  fromMessageId: string;
+  accessToken: string;
+}): Promise<void> {
+  const url = getClientApiBaseUrl();
+  const response = await fetch(
+    `${url}/api/chats/${encodeURIComponent(chatId)}/messages/trailing?from_message_id=${encodeURIComponent(fromMessageId)}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  );
 
-  if (!memory) {
-    throw new Error("Memory not found");
+  if (!response.ok) {
+    throw new Error("Failed to delete trailing messages");
   }
-
-  if (!memory.room_id) {
-    throw new Error("Room ID not found");
-  }
-
-  await deleteMemoriesByRoomIdAfterTimestamp({
-    roomId: memory.room_id,
-    timestamp: new Date(memory.updated_at),
-  });
 }

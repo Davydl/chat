@@ -1,18 +1,40 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
-import { clientDeleteTrailingMessages } from "@/lib/messages/clientDeleteTrailingMessages";
+import { useDeleteTrailingMessages } from "@/hooks/useDeleteTrailingMessages";
 import { EditingMessageProps } from "./EditingMessage";
 import { useVercelChatContext } from "@/providers/VercelChatProvider";
-import { TextUIPart } from "ai";
+import { TextUIPart, UIMessage } from "ai";
 
 export function MessageEditor({ message, setMode }: EditingMessageProps) {
-  const { setMessages, reload } = useVercelChatContext();
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const { id, setMessages, reload } = useVercelChatContext();
+  if (!id) {
+    throw new Error("MessageEditor requires an active chat id");
+  }
   const text = (message.parts[0] as TextUIPart)?.text || "";
   const [draftContent, setDraftContent] = useState<string>(text);
+  const { deleteTrailingMessages, isDeletingTrailingMessages } =
+    useDeleteTrailingMessages({
+      onSuccess: () => {
+        setMessages((messages) => {
+          const index = messages.findIndex((m) => m.id === message.id);
+          if (index === -1) return messages;
+
+          const updatedMessage: UIMessage = {
+            ...message,
+            parts: [{ type: "text", text: draftContent } as TextUIPart],
+          };
+
+          return [...messages.slice(0, index), updatedMessage];
+        });
+        setMode("view");
+        if (text !== draftContent) {
+          reload();
+        }
+      },
+    });
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -32,39 +54,6 @@ export function MessageEditor({ message, setMode }: EditingMessageProps) {
     setDraftContent(event.target.value);
     adjustHeight();
   };
-
-  // Memoize the submit handler to prevent unnecessary re-renders
-  const handleSubmit = useCallback(async () => {
-    setIsSubmitting(true);
-
-    await clientDeleteTrailingMessages({
-      id: message.id,
-    });
-
-    // @ts-expect-error todo: support UIMessage in setMessages
-    setMessages((messages) => {
-      const index = messages.findIndex((m) => m.id === message.id);
-
-      if (index !== -1) {
-        const updatedMessage = {
-          ...message,
-          content: draftContent,
-          parts: [{ type: "text", text: draftContent }],
-        };
-
-        return [...messages.slice(0, index), updatedMessage];
-      }
-
-      return messages;
-    });
-
-    setMode("view");
-
-    // Only reload if the content has actually changed
-    if (text !== draftContent) {
-      reload();
-    }
-  }, [message.id, text, draftContent, setMessages, setMode, reload]);
 
   return (
     <div className="flex flex-col gap-2 w-full">
@@ -91,11 +80,16 @@ export function MessageEditor({ message, setMode }: EditingMessageProps) {
           data-testid="message-editor-send-button"
           variant="default"
           size="sm"
-          disabled={isSubmitting}
-          onClick={handleSubmit}
+          disabled={isDeletingTrailingMessages}
+          onClick={() => {
+            void deleteTrailingMessages({
+              chatId: id,
+              fromMessageId: message.id,
+            });
+          }}
           className="rounded-xl"
         >
-          {isSubmitting ? "Sending..." : "Send"}
+          {isDeletingTrailingMessages ? "Sending..." : "Send"}
         </Button>
       </div>
     </div>
