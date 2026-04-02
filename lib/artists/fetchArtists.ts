@@ -1,4 +1,4 @@
-import { NEW_API_BASE_URL } from "@/lib/consts";
+import { getClientApiBaseUrl } from "@/lib/api/getClientApiBaseUrl";
 import type { ArtistRecord } from "@/types/Artist";
 
 interface FetchArtistsResponse {
@@ -28,7 +28,7 @@ export async function fetchArtists(
     params.set("org_id", orgId);
   }
 
-  const response = await fetch(`${NEW_API_BASE_URL}/api/artists?${params.toString()}`, {
+  const response = await fetch(`${getClientApiBaseUrl()}/api/artists?${params.toString()}`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },

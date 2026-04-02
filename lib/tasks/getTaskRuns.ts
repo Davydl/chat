@@ -1,4 +1,4 @@
-import { NEW_API_BASE_URL } from "@/lib/consts";
+import { getClientApiBaseUrl } from "@/lib/api/getClientApiBaseUrl";
 
 export interface TaskRunItem {
   id: string;
@@ -34,7 +34,7 @@ export async function getTaskRuns(
   accessToken: string,
   options: GetTaskRunsOptions = {},
 ): Promise<TaskRunItem[]> {
-  const url = new URL(`${NEW_API_BASE_URL}/api/tasks/runs`);
+  const url = new URL(`${getClientApiBaseUrl()}/api/tasks/runs`);
   url.searchParams.set("limit", "20");
 
   if (options.accountIdOverride) {

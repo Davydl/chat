@@ -1,4 +1,4 @@
-import { NEW_API_BASE_URL } from "@/lib/consts";
+import { getClientApiBaseUrl } from "@/lib/api/getClientApiBaseUrl";
 
 /**
  * Disconnect a connected account from a third-party service.
@@ -13,7 +13,7 @@ export async function disconnectConnectorApi(
   connectedAccountId: string,
   accountId?: string,
 ): Promise<boolean> {
-  const response = await fetch(`${NEW_API_BASE_URL}/api/connectors`, {
+  const response = await fetch(`${getClientApiBaseUrl()}/api/connectors`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",

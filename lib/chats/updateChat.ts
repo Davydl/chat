@@ -1,4 +1,4 @@
-import { NEW_API_BASE_URL } from "@/lib/consts";
+import { getClientApiBaseUrl } from "@/lib/api/getClientApiBaseUrl";
 
 export type UpdateChatParams = {
   accessToken: string;
@@ -23,7 +23,7 @@ export async function updateChat({
   chatId,
   topic,
 }: UpdateChatParams): Promise<UpdateChatResponse> {
-  const response = await fetch(`${NEW_API_BASE_URL}/api/chats`, {
+  const response = await fetch(`${getClientApiBaseUrl()}/api/chats`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",

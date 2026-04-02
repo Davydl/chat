@@ -1,4 +1,4 @@
-import { NEW_API_BASE_URL } from "../consts";
+import { getClientApiBaseUrl } from "../api/getClientApiBaseUrl";
 import { CatalogSongsResponse } from "./getCatalogSongs";
 import { Tables } from "@/types/database.types";
 
@@ -18,7 +18,7 @@ export async function postCatalogSongs(
   songs: CatalogSongInput[]
 ): Promise<CatalogSongsResponse> {
   try {
-    const response = await fetch(`${NEW_API_BASE_URL}/api/catalogs/songs`, {
+    const response = await fetch(`${getClientApiBaseUrl()}/api/catalogs/songs`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

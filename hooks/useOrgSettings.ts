@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { uploadFile } from "@/lib/arweave/uploadFile";
 import { getFileMimeType } from "@/utils/getFileMimeType";
-import { NEW_API_BASE_URL } from "@/lib/consts";
+import { getClientApiBaseUrl } from "@/lib/api/getClientApiBaseUrl";
 import useAccountOrganizations from "./useAccountOrganizations";
 
 interface KnowledgeItem {
@@ -64,7 +64,7 @@ const useOrgSettings = (orgId: string | null) => {
       setIsLoading(true);
       try {
         const response = await fetch(
-          `${NEW_API_BASE_URL}/api/accounts/${orgId}`
+          `${getClientApiBaseUrl()}/api/accounts/${orgId}`
         );
         if (response.ok) {
           const data = await response.json();
