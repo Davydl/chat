@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { useVercelChatContext } from "@/providers/VercelChatProvider";
 import { useConversationsProvider } from "@/providers/ConversationsProvider";
 import { CreateArtistResult } from "@/types/createArtistResult";
-import copyMessagesClient from "@/lib/copyMessagesClient";
+import copyMessages from "@/lib/messages/copyMessages";
+import { useAccessToken } from "@/hooks/useAccessToken";
+import { useApiOverride } from "@/hooks/useApiOverride";
 
 /**
  * Hook for managing the create artist tool result
@@ -11,6 +13,8 @@ import copyMessagesClient from "@/lib/copyMessagesClient";
 export function useCreateArtistTool(result: CreateArtistResult) {
   const { status, id } = useVercelChatContext();
   const { refetchConversations } = useConversationsProvider();
+  const accessToken = useAccessToken();
+  const apiOverride = useApiOverride();
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,7 +28,8 @@ export function useCreateArtistTool(result: CreateArtistResult) {
       !result.artist ||
       !result.artist.account_id ||
       isProcessing ||
-      !isFinishedStreaming;
+      !isFinishedStreaming ||
+      !accessToken;
     if (shouldSkip) {
       return;
     }
@@ -38,9 +43,11 @@ export function useCreateArtistTool(result: CreateArtistResult) {
 
         if (needsRedirect) {
           // Copy messages from current room to the newly created room
-          const success = await copyMessagesClient(
+          const success = await copyMessages(
             id as string,
-            result.newRoomId as string
+            result.newRoomId as string,
+            accessToken,
+            apiOverride ?? undefined,
           );
 
           // Refresh conversations to show the new chat
@@ -66,7 +73,15 @@ export function useCreateArtistTool(result: CreateArtistResult) {
     };
 
     processCreateArtistResult();
-  }, [status, result, id, isProcessing, refetchConversations]);
+  }, [
+    status,
+    result,
+    id,
+    isProcessing,
+    refetchConversations,
+    accessToken,
+    apiOverride,
+  ]);
 
   return {
     isProcessing,
