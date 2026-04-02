@@ -1,12 +1,11 @@
-import { NEW_API_BASE_URL } from "@/lib/consts";
+import { getClientApiBaseUrl } from "@/lib/api/getClientApiBaseUrl";
 
 const getChatMessages = async (
   chatId: string,
   accessToken: string,
-  baseUrl?: string,
 ) => {
   try {
-    const url = baseUrl || NEW_API_BASE_URL;
+    const url = getClientApiBaseUrl();
     const response = await fetch(
       `${url}/api/chats/${encodeURIComponent(chatId)}/messages`,
       {

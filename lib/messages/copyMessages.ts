@@ -1,4 +1,4 @@
-import { NEW_API_BASE_URL } from "@/lib/consts";
+import { getClientApiBaseUrl } from "@/lib/api/getClientApiBaseUrl";
 import type {
   CopyChatMessagesRequest,
   CopyChatMessagesResponse,
@@ -14,10 +14,9 @@ export async function copyMessages(
   sourceRoomId: string,
   targetRoomId: string,
   accessToken: string,
-  baseUrl?: string,
 ): Promise<boolean> {
   try {
-    const url = baseUrl || NEW_API_BASE_URL;
+    const url = getClientApiBaseUrl();
     const payload: CopyChatMessagesRequest = {
       targetChatId: targetRoomId,
       clearExisting: true,

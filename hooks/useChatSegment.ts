@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { usePrivy } from "@privy-io/react-auth";
-import { useApiOverride } from "@/hooks/useApiOverride";
 import { getChatSegment } from "@/lib/chats/getChatSegment";
 
 interface RoomSegmentResponse {
@@ -9,7 +8,6 @@ interface RoomSegmentResponse {
 
 export const useChatSegment = (roomId?: string) => {
   const { getAccessToken } = usePrivy();
-  const apiOverride = useApiOverride();
 
   return useQuery({
     queryKey: ["roomSegment", roomId],
@@ -19,7 +17,7 @@ export const useChatSegment = (roomId?: string) => {
       const accessToken = await getAccessToken();
       if (!accessToken) throw new Error("No access token");
 
-      const data = await getChatSegment(roomId, accessToken, apiOverride ?? undefined);
+      const data = await getChatSegment(roomId, accessToken);
       return { segmentId: data.segment_id ?? null };
     },
     enabled: !!roomId,

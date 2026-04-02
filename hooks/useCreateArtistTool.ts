@@ -4,7 +4,6 @@ import { useConversationsProvider } from "@/providers/ConversationsProvider";
 import { CreateArtistResult } from "@/types/createArtistResult";
 import copyMessages from "@/lib/messages/copyMessages";
 import { usePrivy } from "@privy-io/react-auth";
-import { useApiOverride } from "@/hooks/useApiOverride";
 
 /**
  * Hook for managing the create artist tool result
@@ -14,7 +13,6 @@ export function useCreateArtistTool(result: CreateArtistResult) {
   const { status, id } = useVercelChatContext();
   const { refetchConversations } = useConversationsProvider();
   const { getAccessToken } = usePrivy();
-  const apiOverride = useApiOverride();
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -49,7 +47,6 @@ export function useCreateArtistTool(result: CreateArtistResult) {
             id as string,
             result.newRoomId as string,
             accessToken,
-            apiOverride ?? undefined,
           );
 
           // Refresh conversations to show the new chat
@@ -82,7 +79,6 @@ export function useCreateArtistTool(result: CreateArtistResult) {
     isProcessing,
     refetchConversations,
     getAccessToken,
-    apiOverride,
   ]);
 
   return {
