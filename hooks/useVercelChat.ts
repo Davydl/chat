@@ -7,7 +7,6 @@ import { useParams } from "next/navigation";
 import { toast } from "react-toastify";
 import { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import getEarliestFailedUserMessageId from "@/lib/messages/getEarliestFailedUserMessageId";
-import { clientDeleteTrailingMessages } from "@/lib/messages/clientDeleteTrailingMessages";
 import { generateUUID } from "@/lib/generateUUID";
 import { useConversationsProvider } from "@/providers/ConversationsProvider";
 import { UIMessage, FileUIPart } from "ai";
@@ -22,6 +21,7 @@ import { usePrivy } from "@privy-io/react-auth";
 import { useApiOverride } from "@/hooks/useApiOverride";
 import { TextAttachment } from "@/types/textAttachment";
 import { formatTextAttachments } from "@/lib/chat/formatTextAttachments";
+import { useDeleteTrailingMessages } from "./useDeleteTrailingMessages";
 
 // 30 days in seconds for Supabase signed URL expiry
 const SIGNED_URL_EXPIRES_SECONDS = 60 * 60 * 24 * 30;
@@ -51,7 +51,6 @@ export function useVercelChat({
 
   const userId = userData?.account_id || userData?.id; // Use account_id if available, fallback to id
   const artistId = selectedArtist?.account_id;
-  const [hasChatApiError, setHasChatApiError] = useState(false);
   const messagesLengthRef = useRef<number>();
   const { addOptimisticConversation } = useConversationsProvider();
   const { data: availableModels = [] } = useAvailableModels();
@@ -62,7 +61,7 @@ export function useVercelChat({
   );
   const { refetchCredits } = usePaymentProvider();
   const { transport, getHeaders } = useChatTransport();
-  const { getAccessToken, authenticated } = usePrivy();
+  const { authenticated } = usePrivy();
   const apiOverride = useApiOverride();
 
   // Load artist files for mentions (from Supabase)
@@ -186,13 +185,32 @@ export function useVercelChat({
       onError: (e) => {
         console.error("An error occurred, please try again!", e);
         toast.error("An error occurred, please try again!");
-        setHasChatApiError(true);
       },
       onFinish: async () => {
         // Update credits after AI response completes
         await refetchCredits();
       },
     });
+
+  const earliestFailedUserMessageId = useMemo(
+    () => getEarliestFailedUserMessageId(messages),
+    [messages],
+  );
+
+  const { deleteTrailingMessages } = useDeleteTrailingMessages({
+    onSuccess: () => {
+      setMessages((messages) => {
+        const index = messages.findIndex(
+          (m) => m.id === earliestFailedUserMessageId,
+        );
+        if (index !== -1) {
+          return [...messages.slice(0, index)];
+        }
+
+        return messages;
+      });
+    },
+  });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -262,30 +280,6 @@ export function useVercelChat({
 
   const isGeneratingResponse = ["streaming", "submitted"].includes(status);
 
-  const deleteTrailingMessages = async () => {
-    const earliestFailedUserMessageId =
-      getEarliestFailedUserMessageId(messages);
-    if (earliestFailedUserMessageId) {
-      const successfulDeletion = await clientDeleteTrailingMessages({
-        id: earliestFailedUserMessageId,
-      });
-      if (successfulDeletion) {
-        setMessages((messages) => {
-          const index = messages.findIndex(
-            (m) => m.id === earliestFailedUserMessageId,
-          );
-          if (index !== -1) {
-            return [...messages.slice(0, index)];
-          }
-
-          return messages;
-        });
-      }
-    }
-
-    setHasChatApiError(false);
-  };
-
   const silentlyUpdateUrl = useCallback(() => {
     window.history.replaceState({}, "", `/chat/${id}`);
   }, [id]);
@@ -293,8 +287,11 @@ export function useVercelChat({
   const handleSendMessage = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (hasChatApiError) {
-      await deleteTrailingMessages();
+    if (earliestFailedUserMessageId) {
+      await deleteTrailingMessages({
+        chatId: id,
+        fromMessageId: earliestFailedUserMessageId,
+      });
     }
 
     // Capture the input value before it's cleared by handleSubmit
