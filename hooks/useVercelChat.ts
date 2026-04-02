@@ -262,6 +262,11 @@ export function useVercelChat({
     sendMessage(message, { body: chatRequestBody, headers });
   };
 
+  const handleReload = useCallback(async () => {
+    const headers = await getHeaders();
+    await regenerate({ body: chatRequestBody, headers });
+  }, [getHeaders, regenerate, chatRequestBody]);
+
   // Keep messagesRef in sync with messages
   messagesLengthRef.current = messages.length;
 
@@ -367,7 +372,7 @@ export function useVercelChat({
     setModel,
     availableModels,
     stop,
-    reload: regenerate,
+    reload: handleReload,
     append,
   };
 }
