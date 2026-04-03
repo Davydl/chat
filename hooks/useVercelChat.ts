@@ -18,7 +18,6 @@ import useArtistFilesForMentions from "@/hooks/useArtistFilesForMentions";
 import type { KnowledgeBaseEntry } from "@/lib/supabase/getArtistKnowledge";
 import { useChatTransport } from "./useChatTransport";
 import { usePrivy } from "@privy-io/react-auth";
-import { useApiOverride } from "@/hooks/useApiOverride";
 import { TextAttachment } from "@/types/textAttachment";
 import { formatTextAttachments } from "@/lib/chat/formatTextAttachments";
 import { useDeleteTrailingMessages } from "./useDeleteTrailingMessages";
@@ -62,7 +61,6 @@ export function useVercelChat({
   const { refetchCredits } = usePaymentProvider();
   const { transport, getHeaders } = useChatTransport();
   const { authenticated } = usePrivy();
-  const apiOverride = useApiOverride();
 
   // Load artist files for mentions (from Supabase)
   const { files: allArtistFiles = [] } = useArtistFilesForMentions();
@@ -268,7 +266,6 @@ export function useVercelChat({
   const { isLoading: isMessagesLoading, hasError } = useMessageLoader(
     messages.length === 0 ? id : undefined,
     userId,
-    apiOverride,
     setMessages,
   );
 

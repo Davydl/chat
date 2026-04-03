@@ -1,24 +1,23 @@
-import { NEW_API_BASE_URL } from "@/lib/consts";
-
-const API_OVERRIDE_STORAGE_KEY = "recoup_api_override";
+import { API_OVERRIDE_STORAGE_KEY, NEW_API_BASE_URL } from "@/lib/consts";
 
 /**
- * Resolves the API base URL on the client using the persisted override when present.
+ * Resolves the API base URL for client-side API calls.
  */
 export function getClientApiBaseUrl(): string {
-  if (typeof window === "undefined") {
-    return NEW_API_BASE_URL;
+  const defaultApiBaseUrl = NEW_API_BASE_URL.replace(/\/+$/, "");
+
+  if (typeof window !== "undefined") {
+    try {
+      const storedApiOverride = window.sessionStorage.getItem(
+        API_OVERRIDE_STORAGE_KEY,
+      );
+      if (storedApiOverride) {
+        return storedApiOverride.replace(/\/+$/, "");
+      }
+    } catch {
+      // Ignore storage failures and fall back to default.
+    }
   }
 
-  const override = window.sessionStorage.getItem(API_OVERRIDE_STORAGE_KEY);
-  if (!override) {
-    return NEW_API_BASE_URL;
-  }
-
-  try {
-    new URL(override);
-    return override;
-  } catch {
-    return NEW_API_BASE_URL;
-  }
+  return defaultApiBaseUrl;
 }

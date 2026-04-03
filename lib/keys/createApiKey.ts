@@ -1,4 +1,4 @@
-import { NEW_API_BASE_URL } from "@/lib/consts";
+import { getClientApiBaseUrl } from "@/lib/api/getClientApiBaseUrl";
 
 /**
  * Create a new API key for the authenticated account
@@ -10,7 +10,7 @@ export async function createApiKey(
   keyName: string,
   accessToken: string
 ): Promise<string> {
-  const response = await fetch(`${NEW_API_BASE_URL}/api/keys`, {
+  const response = await fetch(`${getClientApiBaseUrl()}/api/keys`, {
     method: "POST",
     body: JSON.stringify({ key_name: keyName }),
     headers: {

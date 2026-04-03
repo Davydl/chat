@@ -1,6 +1,4 @@
-import { NEW_API_BASE_URL } from "@/lib/consts";
-
-export const PULSE_API_URL = `${NEW_API_BASE_URL}/api/pulses`;
+import { getClientApiBaseUrl } from "@/lib/api/getClientApiBaseUrl";
 
 export type Pulse = {
   id: string | null;
@@ -20,7 +18,7 @@ export type GetPulseParams = {
 export async function getPulse({
   accessToken,
 }: GetPulseParams): Promise<PulseResponse> {
-  const response = await fetch(PULSE_API_URL, {
+  const response = await fetch(`${getClientApiBaseUrl()}/api/pulses`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken}`,

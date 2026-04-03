@@ -1,7 +1,7 @@
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
 import { useUserProvider } from "@/providers/UserProvder";
 import { usePrivy } from "@privy-io/react-auth";
-import { NEW_API_BASE_URL } from "@/lib/consts";
+import { getClientApiBaseUrl } from "@/lib/api/getClientApiBaseUrl";
 
 export interface AccountOrganization {
   id: string;
@@ -21,7 +21,7 @@ interface OrganizationsResponse {
 const fetchAccountOrganizations = async (
   accessToken: string,
 ): Promise<AccountOrganization[]> => {
-  const response = await fetch(`${NEW_API_BASE_URL}/api/organizations`, {
+  const response = await fetch(`${getClientApiBaseUrl()}/api/organizations`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },

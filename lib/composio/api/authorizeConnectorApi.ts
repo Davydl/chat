@@ -1,4 +1,4 @@
-import { NEW_API_BASE_URL } from "@/lib/consts";
+import { getClientApiBaseUrl } from "@/lib/api/getClientApiBaseUrl";
 
 interface AuthorizeConnectorParams {
   connector: string;
@@ -17,7 +17,7 @@ export async function authorizeConnectorApi(
   accessToken: string,
   params: AuthorizeConnectorParams,
 ): Promise<string | null> {
-  const response = await fetch(`${NEW_API_BASE_URL}/api/connectors`, {
+  const response = await fetch(`${getClientApiBaseUrl()}/api/connectors`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

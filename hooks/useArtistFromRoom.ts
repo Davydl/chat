@@ -4,7 +4,6 @@ import { usePrivy } from "@privy-io/react-auth";
 import { useArtistProvider } from "@/providers/ArtistProvider";
 import { useUserProvider } from "@/providers/UserProvder";
 import type { ArtistRecord } from "@/types/Artist";
-import { useApiOverride } from "@/hooks/useApiOverride";
 import { getChatArtist } from "@/lib/chats/getChatArtist";
 
 /**
@@ -15,14 +14,13 @@ export function useArtistFromRoom(roomId: string) {
   const { getAccessToken } = usePrivy();
   const { userData } = useUserProvider();
   const { selectedArtist, artists, setSelectedArtist, getArtists } = useArtistProvider();
-  const apiOverride = useApiOverride();
 
   const { data } = useQuery({
     queryKey: ["chatArtist", roomId],
     queryFn: async () => {
       const accessToken = await getAccessToken();
       if (!accessToken) throw new Error("No access token");
-      return getChatArtist(roomId, accessToken, apiOverride ?? undefined);
+      return getChatArtist(roomId, accessToken);
     },
     enabled: !!roomId && !!userData?.id,
     staleTime: Infinity,

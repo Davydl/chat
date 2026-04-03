@@ -1,4 +1,4 @@
-import { NEW_API_BASE_URL } from "@/lib/consts";
+import { getClientApiBaseUrl } from "@/lib/api/getClientApiBaseUrl";
 import { Tables } from "@/types/database.types";
 
 export type ApiKey = Tables<"account_api_keys">;
@@ -9,7 +9,7 @@ export type ApiKey = Tables<"account_api_keys">;
  * @returns Promise with the list of API keys
  */
 export async function fetchApiKeys(accessToken: string): Promise<ApiKey[]> {
-  const response = await fetch(`${NEW_API_BASE_URL}/api/keys`, {
+  const response = await fetch(`${getClientApiBaseUrl()}/api/keys`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

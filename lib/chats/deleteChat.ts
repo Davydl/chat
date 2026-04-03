@@ -1,4 +1,4 @@
-import { NEW_API_BASE_URL } from "@/lib/consts";
+import { getClientApiBaseUrl } from "@/lib/api/getClientApiBaseUrl";
 
 /**
  * Deletes a chat by ID via the API service.
@@ -6,9 +6,8 @@ import { NEW_API_BASE_URL } from "@/lib/consts";
 export async function deleteChat(
   roomId: string,
   accessToken: string,
-  baseUrl?: string,
 ): Promise<void> {
-  const url = baseUrl || NEW_API_BASE_URL;
+  const url = getClientApiBaseUrl();
 
   const response = await fetch(`${url}/api/chats`, {
     method: "DELETE",

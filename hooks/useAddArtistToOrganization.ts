@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { NEW_API_BASE_URL } from "@/lib/consts";
+import { getClientApiBaseUrl } from "@/lib/api/getClientApiBaseUrl";
 
 interface UseAddArtistToOrganizationOptions {
   onSuccess?: (orgId: string) => void;
@@ -16,7 +16,7 @@ const useAddArtistToOrganization = (options?: UseAddArtistToOrganizationOptions)
     async (artistId: string, organizationId: string) => {
       setAddingToOrgId(organizationId);
       try {
-        const response = await fetch(`${NEW_API_BASE_URL}/api/organizations/artists`, {
+        const response = await fetch(`${getClientApiBaseUrl()}/api/organizations/artists`, {
           method: "POST",
           body: JSON.stringify({
             artistId,
