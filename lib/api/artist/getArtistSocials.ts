@@ -1,4 +1,4 @@
-import { NEW_API_BASE_URL } from "@/lib/consts";
+import { getClientApiBaseUrl } from "@/lib/api/getClientApiBaseUrl";
 
 // Response types
 export interface Social {
@@ -31,7 +31,7 @@ export async function getArtistSocials(
   artist_account_id: string
 ): Promise<SocialResponse> {
   // Construct URL with query parameters
-  const url = new URL(`${NEW_API_BASE_URL}/api/artist/socials`);
+  const url = new URL(`${getClientApiBaseUrl()}/api/artist/socials`);
   url.searchParams.append("artist_account_id", artist_account_id);
 
   // Make the API request

@@ -3,7 +3,7 @@
  */
 
 import { Tables } from "@/types/database.types";
-import { NEW_API_BASE_URL } from "../consts";
+import { getClientApiBaseUrl } from "../api/getClientApiBaseUrl";
 
 type Song = Tables<"songs">;
 type Account = Tables<"accounts">;
@@ -43,7 +43,7 @@ export async function getCatalogSongs(
     }
 
     const response = await fetch(
-      `${NEW_API_BASE_URL}/api/catalogs/songs?${params}`,
+      `${getClientApiBaseUrl()}/api/catalogs/songs?${params}`,
       {
         method: "GET",
         headers: {

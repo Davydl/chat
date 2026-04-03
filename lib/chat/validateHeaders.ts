@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { NEW_API_BASE_URL } from "@/lib/consts";
+import { getClientApiBaseUrl } from "@/lib/api/getClientApiBaseUrl";
 import { getCorsHeaders } from "@/lib/chat/getCorsHeaders";
 import { serializeError } from "@/lib/errors/serializeError";
 
@@ -39,7 +39,7 @@ export async function validateHeaders(
 
     headers.set("Content-Type", "application/json");
 
-    const response = await fetch(`${NEW_API_BASE_URL}/api/accounts/id`, {
+    const response = await fetch(`${getClientApiBaseUrl()}/api/accounts/id`, {
       method: "GET",
       headers,
     });

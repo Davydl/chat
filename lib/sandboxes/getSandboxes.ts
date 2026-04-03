@@ -1,4 +1,4 @@
-import { NEW_API_BASE_URL } from "@/lib/consts";
+import { getClientApiBaseUrl } from "@/lib/api/getClientApiBaseUrl";
 import type { Sandbox } from "./createSandbox";
 import type { FileTreeEntry } from "./convertFileTreeEntries";
 
@@ -17,7 +17,7 @@ export interface GetSandboxesResult {
 export async function getSandboxes(
   accessToken: string
 ): Promise<GetSandboxesResult> {
-  const response = await fetch(`${NEW_API_BASE_URL}/api/sandboxes`, {
+  const response = await fetch(`${getClientApiBaseUrl()}/api/sandboxes`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken}`,

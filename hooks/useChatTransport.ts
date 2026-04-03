@@ -1,14 +1,11 @@
 import { useMemo, useCallback } from "react";
 import { DefaultChatTransport } from "ai";
-import { NEW_API_BASE_URL } from "@/lib/consts";
+import { getClientApiBaseUrl } from "@/lib/api/getClientApiBaseUrl";
 import { usePrivy } from "@privy-io/react-auth";
-import { useApiOverride } from "./useApiOverride";
 
 export function useChatTransport() {
   const { getAccessToken } = usePrivy();
-  const apiOverride = useApiOverride();
-
-  const baseUrl = apiOverride || NEW_API_BASE_URL;
+  const baseUrl = getClientApiBaseUrl();
 
   const getHeaders = useCallback(async () => {
     const accessToken = await getAccessToken();

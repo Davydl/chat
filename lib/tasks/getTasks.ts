@@ -1,6 +1,6 @@
 import { Tables } from "@/types/database.types";
 import { TaskRunItem } from "@/lib/tasks/getTaskRuns";
-import { TASKS_API_URL } from "@/lib/consts";
+import { getClientApiBaseUrl } from "@/lib/api/getClientApiBaseUrl";
 
 type ScheduledAction = Tables<"scheduled_actions">;
 
@@ -30,7 +30,7 @@ export async function getTasks(
   params?: GetTasksParams
 ): Promise<Task[]> {
   try {
-    const url = new URL(TASKS_API_URL);
+    const url = new URL(`${getClientApiBaseUrl()}/api/tasks`);
 
     if (params?.id) {
       url.searchParams.append("id", params.id);

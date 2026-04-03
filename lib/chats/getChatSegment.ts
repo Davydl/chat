@@ -1,4 +1,4 @@
-import { NEW_API_BASE_URL } from "@/lib/consts";
+import { getClientApiBaseUrl } from "@/lib/api/getClientApiBaseUrl";
 
 interface ChatSegmentResponse {
   status: string;
@@ -13,9 +13,8 @@ interface ChatSegmentResponse {
 export async function getChatSegment(
   roomId: string,
   accessToken: string,
-  baseUrl?: string,
 ): Promise<ChatSegmentResponse> {
-  const url = baseUrl || NEW_API_BASE_URL;
+  const url = getClientApiBaseUrl();
 
   const response = await fetch(`${url}/api/chats/${encodeURIComponent(roomId)}/segment`, {
     headers: {

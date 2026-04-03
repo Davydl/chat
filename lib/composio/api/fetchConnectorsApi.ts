@@ -1,4 +1,4 @@
-import { NEW_API_BASE_URL } from "@/lib/consts";
+import { getClientApiBaseUrl } from "@/lib/api/getClientApiBaseUrl";
 import type { ConnectorInfo } from "@/hooks/useConnectors";
 
 /**
@@ -12,7 +12,7 @@ export async function fetchConnectorsApi(
   accessToken: string,
   accountId?: string,
 ): Promise<ConnectorInfo[]> {
-  const url = new URL(`${NEW_API_BASE_URL}/api/connectors`);
+  const url = new URL(`${getClientApiBaseUrl()}/api/connectors`);
   if (accountId) {
     url.searchParams.set("account_id", accountId);
   }

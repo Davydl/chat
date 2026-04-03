@@ -1,4 +1,4 @@
-import { NEW_API_BASE_URL } from "@/lib/consts";
+import { getClientApiBaseUrl } from "@/lib/api/getClientApiBaseUrl";
 import { upload } from "@vercel/blob/client";
 
 interface UploadedFile {
@@ -64,7 +64,7 @@ export async function uploadSandboxFiles({
     );
   }
 
-  const response = await fetch(`${NEW_API_BASE_URL}/api/sandboxes/files`, {
+  const response = await fetch(`${getClientApiBaseUrl()}/api/sandboxes/files`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken}`,

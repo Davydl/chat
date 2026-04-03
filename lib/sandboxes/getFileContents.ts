@@ -1,4 +1,4 @@
-import { NEW_API_BASE_URL } from "@/lib/consts";
+import { getClientApiBaseUrl } from "@/lib/api/getClientApiBaseUrl";
 import { getMimeFromPath } from "@/lib/files/getMimeFromPath";
 
 interface GetFileContentsResponse {
@@ -23,7 +23,7 @@ export async function getFileContents(
   path: string,
 ): Promise<FileContentsResult> {
   const response = await fetch(
-    `${NEW_API_BASE_URL}/api/sandboxes/file?path=${encodeURIComponent(path)}`,
+    `${getClientApiBaseUrl()}/api/sandboxes/file?path=${encodeURIComponent(path)}`,
     {
       method: "GET",
       headers: {

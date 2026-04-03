@@ -8,7 +8,7 @@ import type { ArtistAgent } from "@/lib/supabase/getArtistAgents";
 import { useArtistProvider } from "@/providers/ArtistProvider";
 import { useConversationsProvider } from "@/providers/ConversationsProvider";
 import { usePrivy } from "@privy-io/react-auth";
-import { NEW_API_BASE_URL } from "@/lib/consts";
+import { getClientApiBaseUrl } from "@/lib/api/getClientApiBaseUrl";
 
 const useCreateChat = ({
   isOptimisticChatItem,
@@ -69,7 +69,7 @@ const useCreateChat = ({
           firstMessage: messageText,
         };
 
-        const response = await fetch(`${NEW_API_BASE_URL}/api/chats`, {
+        const response = await fetch(`${getClientApiBaseUrl()}/api/chats`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

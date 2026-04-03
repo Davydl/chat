@@ -1,5 +1,5 @@
 import type { Conversation } from "@/types/Chat";
-import { NEW_API_BASE_URL } from "@/lib/consts";
+import { getClientApiBaseUrl } from "@/lib/api/getClientApiBaseUrl";
 
 /**
  * Fetches conversations from the Recoup API.
@@ -24,7 +24,7 @@ const getConversations = async (
   }
 
   try {
-    const url = `${NEW_API_BASE_URL}/api/chats`;
+    const url = `${getClientApiBaseUrl()}/api/chats`;
 
     const response = await fetch(url, {
       method: "GET",

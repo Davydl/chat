@@ -1,4 +1,4 @@
-import { NEW_API_BASE_URL } from "../consts";
+import { getClientApiBaseUrl } from "../api/getClientApiBaseUrl";
 
 interface SpotifyArtist {
   external_urls: {
@@ -43,7 +43,7 @@ interface SpotifySearchResponse {
 export async function getSpotifyFollowers(artistName: string): Promise<number> {
   try {
     const encodedName = encodeURIComponent(artistName);
-    const url = `${NEW_API_BASE_URL}/api/spotify/search?q=${encodedName}&type=artist`;
+    const url = `${getClientApiBaseUrl()}/api/spotify/search?q=${encodedName}&type=artist`;
 
     const response = await fetch(url);
 
