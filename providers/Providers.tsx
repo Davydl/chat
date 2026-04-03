@@ -13,11 +13,13 @@ import WagmiProvider from "./WagmiProvider";
 import { MiniAppProvider } from "./MiniAppProvider";
 import { ThemeProvider } from "./ThemeProvider";
 import { OrganizationProvider } from "./OrganizationProvider";
+import ApiOverrideSync from "./ApiOverrideSync";
 
 const queryClient = new QueryClient();
 
 const Providers = ({ children }: { children: React.ReactNode }) => (
   <QueryClientProvider client={queryClient}>
+    <ApiOverrideSync />
     <ThemeProvider 
       attribute="class" 
       defaultTheme="system" 

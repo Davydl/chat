@@ -1,9 +1,5 @@
 import { getClientApiBaseUrl } from "@/lib/api/getClientApiBaseUrl";
 
-export function getPulseApiUrl(): string {
-  return `${getClientApiBaseUrl()}/api/pulses`;
-}
-
 export type Pulse = {
   id: string | null;
   account_id: string;
@@ -22,7 +18,7 @@ export type GetPulseParams = {
 export async function getPulse({
   accessToken,
 }: GetPulseParams): Promise<PulseResponse> {
-  const response = await fetch(getPulseApiUrl(), {
+  const response = await fetch(`${getClientApiBaseUrl()}/api/pulses`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken}`,

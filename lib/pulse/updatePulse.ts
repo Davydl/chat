@@ -1,4 +1,6 @@
-import { PulseResponse, getPulseApiUrl } from "./getPulse";
+import { getClientApiBaseUrl } from "@/lib/api/getClientApiBaseUrl";
+
+import { PulseResponse } from "./getPulse";
 
 export type UpdatePulseParams = {
   accessToken: string;
@@ -9,7 +11,7 @@ export async function updatePulse({
   accessToken,
   active,
 }: UpdatePulseParams): Promise<PulseResponse> {
-  const response = await fetch(getPulseApiUrl(), {
+  const response = await fetch(`${getClientApiBaseUrl()}/api/pulses`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",

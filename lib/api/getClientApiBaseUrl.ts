@@ -1,25 +1,23 @@
-import { NEW_API_BASE_URL } from "@/lib/consts";
-
-function normalizeApiBaseUrl(url: string): string {
-  return url.replace(/\/+$/, "");
-}
+import { API_OVERRIDE_STORAGE_KEY, NEW_API_BASE_URL } from "@/lib/consts";
 
 /**
  * Resolves the API base URL for client-side API calls.
- * Query param override: ?api=https://example.com
  */
 export function getClientApiBaseUrl(): string {
+  const defaultApiBaseUrl = NEW_API_BASE_URL.replace(/\/+$/, "");
+
   if (typeof window !== "undefined") {
-    const apiParam = new URLSearchParams(window.location.search).get("api");
-    if (apiParam && apiParam !== "clear") {
-      try {
-        new URL(apiParam);
-        return normalizeApiBaseUrl(apiParam);
-      } catch {
-        // Ignore invalid override URL and fall back to default.
+    try {
+      const storedApiOverride = window.sessionStorage.getItem(
+        API_OVERRIDE_STORAGE_KEY,
+      );
+      if (storedApiOverride) {
+        return storedApiOverride.replace(/\/+$/, "");
       }
+    } catch {
+      // Ignore storage failures and fall back to default.
     }
   }
 
-  return normalizeApiBaseUrl(NEW_API_BASE_URL);
+  return defaultApiBaseUrl;
 }
