@@ -13,6 +13,7 @@ import { UIMessage, FileUIPart } from "ai";
 import useAvailableModels from "./useAvailableModels";
 import { useLocalStorage } from "usehooks-ts";
 import { DEFAULT_MODEL } from "@/lib/consts";
+import { useAccountOverride } from "@/providers/AccountOverrideProvider";
 import { usePaymentProvider } from "@/providers/PaymentProvider";
 import useArtistFilesForMentions from "@/hooks/useArtistFilesForMentions";
 import type { KnowledgeBaseEntry } from "@/lib/supabase/getArtistKnowledge";
@@ -163,15 +164,18 @@ export function useVercelChat({
     return outputs;
   }, [knowledgeFiles]);
 
+  const { accountIdOverride } = useAccountOverride();
+
   const chatRequestBody = useMemo(
     () => ({
       roomId: id,
       artistId,
       // Only include organizationId if it's not null (schema expects string | undefined)
       ...(organizationId && { organizationId }),
+      ...(accountIdOverride && { accountId: accountIdOverride }),
       model,
     }),
-    [id, artistId, organizationId, model],
+    [id, artistId, organizationId, accountIdOverride, model],
   );
 
   const { messages, status, stop, sendMessage, setMessages, regenerate } =

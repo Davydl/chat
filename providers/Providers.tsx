@@ -14,37 +14,40 @@ import { MiniAppProvider } from "./MiniAppProvider";
 import { ThemeProvider } from "./ThemeProvider";
 import { OrganizationProvider } from "./OrganizationProvider";
 import ApiOverrideSync from "./ApiOverrideSync";
+import { AccountOverrideProvider } from "./AccountOverrideProvider";
 
 const queryClient = new QueryClient();
 
 const Providers = ({ children }: { children: React.ReactNode }) => (
   <QueryClientProvider client={queryClient}>
     <ApiOverrideSync />
-    <ThemeProvider 
-      attribute="class" 
-      defaultTheme="system" 
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
       enableSystem={true}
       disableTransitionOnChange
     >
       <WagmiProvider>
         <PrivyProvider>
+          <AccountOverrideProvider>
           <MiniKitProvider>
             <MiniAppProvider>
               <UserProvider>
                 <OrganizationProvider>
-                <FunnelReportProvider>
-                  <ArtistProvider>
-                    <SidebarExpansionProvider>
-                      <ConversationsProvider>
-                        <PaymentProvider>{children}</PaymentProvider>
-                      </ConversationsProvider>
-                    </SidebarExpansionProvider>
-                  </ArtistProvider>
-                </FunnelReportProvider>
+                  <FunnelReportProvider>
+                    <ArtistProvider>
+                      <SidebarExpansionProvider>
+                        <ConversationsProvider>
+                          <PaymentProvider>{children}</PaymentProvider>
+                        </ConversationsProvider>
+                      </SidebarExpansionProvider>
+                    </ArtistProvider>
+                  </FunnelReportProvider>
                 </OrganizationProvider>
               </UserProvider>
             </MiniAppProvider>
           </MiniKitProvider>
+        </AccountOverrideProvider>
         </PrivyProvider>
       </WagmiProvider>
     </ThemeProvider>
