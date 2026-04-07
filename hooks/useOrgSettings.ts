@@ -4,6 +4,8 @@ import { uploadFile } from "@/lib/arweave/uploadFile";
 import { getFileMimeType } from "@/utils/getFileMimeType";
 import { getClientApiBaseUrl } from "@/lib/api/getClientApiBaseUrl";
 import useAccountOrganizations from "./useAccountOrganizations";
+import { usePrivy } from "@privy-io/react-auth";
+import { updateAccountProfile } from "@/lib/accounts/updateAccountProfile";
 
 interface KnowledgeItem {
   name: string;
@@ -21,6 +23,7 @@ interface OrgData {
 
 const useOrgSettings = (orgId: string | null) => {
   const { data: organizations } = useAccountOrganizations();
+  const { getAccessToken } = usePrivy();
   const queryClient = useQueryClient();
   const [orgData, setOrgData] = useState<OrgData | null>(null);
   const [name, setName] = useState("");
@@ -141,30 +144,26 @@ const useOrgSettings = (orgId: string | null) => {
 
     setIsSaving(true);
     try {
-      const response = await fetch("/api/account/update", {
-        method: "POST",
-        body: JSON.stringify({
-          accountId: orgId,
-          name,
-          image,
-          instruction,
-          knowledges,
-        }),
-        headers: { "Content-Type": "application/json" },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setOrgData(data.data);
-        // Invalidate org list cache so sidebar shows updated image/name immediately
-        await queryClient.invalidateQueries({ queryKey: ["accountOrganizations"] });
-        return true;
+      const accessToken = await getAccessToken();
+      if (!accessToken) {
+        return false;
       }
-      return false;
+
+      const data = await updateAccountProfile({
+        accessToken,
+        accountId: orgId,
+        name,
+        image,
+        instruction,
+        knowledges,
+      });
+      setOrgData(data);
+      await queryClient.invalidateQueries({ queryKey: ["accountOrganizations"] });
+      return true;
     } finally {
       setIsSaving(false);
     }
-  }, [orgId, name, image, instruction, knowledges, queryClient]);
+  }, [orgId, name, image, instruction, knowledges, queryClient, getAccessToken]);
 
   return {
     orgData,
